@@ -34,7 +34,7 @@ func (s *Server) Start() {
 			return
 		}
 
-		fmt.Println("start Zinx server  ", s.Name, " succ, now listenning...")
+		fmt.Println("start Zinx server  ", s.Name, s.Port, " succ, now listenning...")
 
 		// 3、 阻塞等待客户端连接，处理客户端连接业务
 		for {
