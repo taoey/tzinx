@@ -7,7 +7,7 @@ import "github.com/taoey/tzinx/znet"
 func main() {
 
 	// 创建一个服务器
-	s := znet.NewServer("[zinx01]", 8080)
+	s := znet.NewServer("[zinx01]", 8999)
 
 	// 启动服务器
 	s.Server()
