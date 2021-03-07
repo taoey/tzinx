@@ -14,19 +14,19 @@ type Connection struct {
 
 	isClose bool
 
-	HandleAPI ziface.HandleFunc
-
 	Exit chan bool
+
+	Router ziface.IRouter
 }
 
 // 初始化连接模块方法
-func NewConnection(conn *net.TCPConn, connID uint32, callbackAPI ziface.HandleFunc) *Connection {
+func NewConnection(conn *net.TCPConn, connID uint32, router ziface.IRouter) *Connection {
 	c := &Connection{
-		Conn:      conn,
-		ConnId:    connID,
-		HandleAPI: callbackAPI,
-		isClose:   false,
-		Exit:      make(chan bool, 1),
+		Conn:    conn,
+		ConnId:  connID,
+		isClose: false,
+		Exit:    make(chan bool, 1),
+		Router:  router,
 	}
 	return c
 }
@@ -39,18 +39,17 @@ func (c *Connection) StartReader() {
 	for {
 		// 读取客户端的数据到buf中
 		buf := make([]byte, 512)
-		cnt, err := c.Conn.Read(buf)
+		_, err := c.Conn.Read(buf)
 		if err != nil {
 			fmt.Println("recv read err", err)
 			continue
 		}
 
-		// 调用当前连接所绑定的api
-		err = c.HandleAPI(c.Conn, buf, cnt)
-		if err != nil {
-			fmt.Println("conn handle err", err)
-			break
-		}
+		go func(request ziface.IRequest) {
+			c.Router.PreHandle(request)
+			c.Router.Handle(request)
+			c.Router.PostHandle(request)
+		}(&Requeset{c, buf})
 
 	}
 }

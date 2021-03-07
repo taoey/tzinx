@@ -37,7 +37,7 @@ func main() {
 			fmt.Println("read buf error")
 			return
 		}
-		fmt.Println("server call back: %s, len:%d \n", string(buf[0:cnt]), cnt)
+		fmt.Printf("server call back: %s, len:%d \n", string(buf[0:cnt]), cnt)
 
 		time.Sleep(time.Second)
 	}

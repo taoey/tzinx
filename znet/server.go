@@ -1,17 +1,17 @@
 package znet
 
 import (
-	"errors"
 	"fmt"
 	"github.com/taoey/tzinx/ziface"
 	"net"
 )
 
 type Server struct {
-	Name      string // 服务器名称
-	IPVersion string // 服务器IP版本
-	IP        string // 服务器监听IP
-	Port      int    // 监听端口号
+	Name      string         // 服务器名称
+	IPVersion string         // 服务器IP版本
+	IP        string         // 服务器监听IP
+	Port      int            // 监听端口号
+	Router    ziface.IRouter // 绑定router
 }
 
 func NewServer(name string, port int) ziface.IServer {
@@ -20,6 +20,7 @@ func NewServer(name string, port int) ziface.IServer {
 		IPVersion: "tcp4",
 		IP:        "0.0.0.0",
 		Port:      port,
+		Router:    nil,
 	}
 	return s
 }
@@ -61,7 +62,7 @@ func (s *Server) Start() {
 			var cid uint32
 			cid = 0
 
-			connection := NewConnection(conn, cid, CallBackToClient)
+			connection := NewConnection(conn, cid, s.Router)
 			cid++
 			go connection.Start()
 
@@ -83,13 +84,7 @@ func (s *Server) Stop() {
 	// TODO 回收服务器资源
 }
 
-// 回显业务,handle api
-func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
-	fmt.Println("callback:write to client")
-
-	if _, err := conn.Write(data[:cnt]); err != nil {
-		fmt.Println("write err", err)
-		return errors.New("CallBackToClient error")
-	}
-	return nil
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
+	fmt.Println("add router succ")
 }
