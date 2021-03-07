@@ -13,6 +13,16 @@ type Server struct {
 	Port      int    // 监听端口号
 }
 
+func NewServer(name string, port int) ziface.IServer {
+	s := &Server{
+		Name:      name,
+		IPVersion: "tcp4",
+		IP:        "0.0.0.0",
+		Port:      port,
+	}
+	return s
+}
+
 //-- iserver接口实现
 
 func (s *Server) Start() {
@@ -83,16 +93,4 @@ func (s *Server) Server() {
 
 func (s *Server) Stop() {
 	// TODO 回收服务器资源
-}
-
-//-- 其他函数
-
-func NewServer(name string, port int) ziface.IServer {
-	s := &Server{
-		Name:      name,
-		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      port,
-	}
-	return s
 }
