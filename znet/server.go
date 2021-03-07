@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"errors"
 	"fmt"
 	"github.com/taoey/tzinx/ziface"
 	"net"
@@ -57,25 +58,12 @@ func (s *Server) Start() {
 			}
 			fmt.Println("Get conn remote addr = ", conn.RemoteAddr().String())
 
-			// 已经建立连接，启动go协程处理相关业务
-			go func() {
-				for {
-					buf := make([]byte, 512)
-					cnt, err := conn.Read(buf)
-					if err != nil {
-						fmt.Println("recv buf err", err)
-						continue
-					}
-					fmt.Println("recv client:", string(buf[0:cnt]))
+			var cid uint32
+			cid = 0
 
-					// 回显
-					if _, err := conn.Write(buf[:cnt]); err != nil {
-						fmt.Println("write back buf err", err)
-						continue
-					}
-
-				}
-			}()
+			connection := NewConnection(conn, cid, CallBackToClient)
+			cid++
+			go connection.Start()
 
 		}
 	}()
@@ -93,4 +81,15 @@ func (s *Server) Server() {
 
 func (s *Server) Stop() {
 	// TODO 回收服务器资源
+}
+
+// 回显业务,handle api
+func CallBackToClient(conn *net.TCPConn, data []byte, cnt int) error {
+	fmt.Println("callback:write to client")
+
+	if _, err := conn.Write(data[:cnt]); err != nil {
+		fmt.Println("write err", err)
+		return errors.New("CallBackToClient error")
+	}
+	return nil
 }
