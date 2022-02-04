@@ -2,8 +2,9 @@ package znet
 
 import (
 	"fmt"
-	"github.com/taoey/tzinx/ziface"
 	"net"
+
+	"github.com/taoey/tzinx/ziface"
 )
 
 // 连接模块

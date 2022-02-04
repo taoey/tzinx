@@ -5,15 +5,10 @@ import "net"
 // 连接模块
 type IConnect interface {
 	Start()
-
 	Stop()
-
 	Send([]byte) error
-
 	GetTCPConnection() *net.TCPConn
-
 	GetConnID() uint32
-
 	RemoteAddr() net.Addr
 }
 
